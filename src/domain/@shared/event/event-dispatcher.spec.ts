@@ -1,3 +1,8 @@
+import AddressChangedEvent from "../../customer/event/address-changed.event";
+import CustomerCreatedEvent from "../../customer/event/customer-created.event";
+import EnviaConsoleLog1Handler from "../../customer/event/handler/envia-console-log-1.handler";
+import EnviaConsoleLog2Handler from "../../customer/event/handler/envia-console-log-2.handler";
+import EnviaConsoleLogHandler from "../../customer/event/handler/envia-console-log.handler";
 import SendEmailWhenProductIsCreatedHandler from "../../product/event/handler/send-email-when-product-is-created.handler";
 import ProductCreatedEvent from "../../product/event/product-created.event";
 import EventDispatcher from "./event-dispatcher";
@@ -78,5 +83,61 @@ describe("Domain events tests", () => {
     eventDispatcher.notify(productCreatedEvent);
 
     expect(spyEventHandler).toHaveBeenCalled();
+  });
+
+  it("should dispatch EnviaConsoleLog1Handler when CustomerCreatedEvent occurs", () => {
+    const dispatcher = new EventDispatcher();
+    const handler = new EnviaConsoleLog1Handler();
+    const spyHandler = jest.spyOn(handler, "handle");
+    dispatcher.register("CustomerCreatedEvent", handler);
+    expect(
+      dispatcher.getEventHandlers["CustomerCreatedEvent"][0]
+    ).toMatchObject(handler);
+    const event = new CustomerCreatedEvent({
+      id: "1",
+      name: "Epaminondas da Silva",
+      active: true,
+    });
+    dispatcher.notify(event);
+    expect(spyHandler).toHaveBeenCalled();
+  });
+
+  it("should dispatch EnviaConsoleLog2Handler when CustomerCreatedEvent occurs", () => {
+    const dispatcher = new EventDispatcher();
+    const handler = new EnviaConsoleLog2Handler();
+    const spyHandler = jest.spyOn(handler, "handle");
+    dispatcher.register("CustomerCreatedEvent", handler);
+    expect(
+      dispatcher.getEventHandlers["CustomerCreatedEvent"][0]
+    ).toMatchObject(handler);
+    const event = new CustomerCreatedEvent({
+      id: "1",
+      name: "Epaminondas da Silva",
+      active: true,
+    });
+    dispatcher.notify(event);
+    expect(spyHandler).toHaveBeenCalled();
+  });
+
+  it("should dispatch EnviaConsoleLogHandler when AddressChanged occurs", () => {
+    const dispatcher = new EventDispatcher();
+    const handler = new EnviaConsoleLogHandler();
+    const spyHandler = jest.spyOn(handler, "handle");
+    dispatcher.register("AddressChangedEvent", handler);
+    expect(dispatcher.getEventHandlers["AddressChangedEvent"][0]).toMatchObject(
+      handler
+    );
+    const event = new AddressChangedEvent({
+      id: "1",
+      name: "Epaminondas da Silva",
+      address: {
+        street: "Rua XV de Novembro",
+        number: 500,
+        city: "Blumenau",
+        zip: "89023-000",
+      },
+    });
+    dispatcher.notify(event);
+    expect(spyHandler).toHaveBeenCalled();
   });
 });
